@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ .Title }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <a href="/">My Forum</a>
+      </div>
+      <div class="nav-right">
+        {{ if .LoggedIn }}
+          <span>Welcome, {{ .Username }}!</span>
+          <a href="/add-post">New Post</a>
+          <a href="/logout">Logout</a>
+        {{ else }}
+          <a href="/login">Login</a>
+          <a href="/register">Register</a>
+        {{ end }}
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="content-container">
+      <h1>Latest Posts</h1>
+      <!-- Filter Form -->
+      <form method="GET" action="/">
+        <div class="filter-group">
+          <h3>Filter by Category:</h3>
+          {{ range .FilterCategories }}
+            <label>
+              <input type="checkbox" name="category" value="{{ .ID }}"
+                     {{ if in $.SelectedCategories .ID }}checked{{ end }}>
+              {{ .Name }}
+            </label>
+          {{ end }}
+        </div>
+
+        {{ if .LoggedIn }}
+          <label>
+            <input type="checkbox" name="created" value="1" {{ if .FilterCreated }}checked{{ end }}>
+            My Posts
+          </label>
+          <label>
+            <input type="checkbox" name="liked" value="1" {{ if .FilterLiked }}checked{{ end }}>
+            Liked Posts
+          </label>
+        {{ end }}
+        <button type="submit">Filter</button>
+      </form>
+      <!-- Posts List -->
+      <div class="posts-container">
+        {{ if .Posts }}
+          {{ range .Posts }}
+            <div class="post">
+              <h2>{{ .Title }}</h2>
+              <p>{{ .Content }}</p>
+              <div class="post-meta">
+                <span>By: {{ .Username }}</span>
+                <span>On: {{ .CreatedAt.Format "Jan 02, 2006" }}</span>
+                <span>Likes: {{ .Likes }}</span>
+                <span>Dislikes: {{ .Dislikes }}</span>
+                {{ if .Categories }}
+                <span>Categories:
+                  {{ range $index, $cat := .Categories }}
+                  {{ if $index }}, {{ end }}
+                  {{ $cat }}
+                  {{ end }}
+                </span>  
+                {{ end }}
+              </div>
+              <div class="post-actions">
+                {{ if $.LoggedIn }}
+                  <a href="/like-post?id={{ .ID }}">Like</a>
+                  <a href="/dislike-post?id={{ .ID }}">Dislike</a>
+                  <a href="/add-comment?id={{ .ID }}">Comment</a>
+                {{ else }}
+                  <a href="/login">Login to interact</a>
+                {{ end }}
+              </div>
+              <!-- Comments Section -->
+              <div class="comments">
+                <h3>Comments</h3>
+                {{ if .Comments }}
+                  {{ range .Comments }}
+                    <div class="comment">
+                      <p>{{ .Content }}</p>
+                      <small>By: {{ .Username }} on {{ .CreatedAt.Format "Jan 02, 2006 15:04" }}</small>
+                      <div class="comment-reactions">
+                        <span>Likes: {{ .Likes }}</span>
+                        <span>Dislikes: {{ .Dislikes }}</span>
+                        {{ if $.LoggedIn }}
+                        <div class="reaction-buttons">
+                          <a href="/like-comment?id={{ .ID }}">Like</a>
+                          <a href="/dislike-comment?id={{ .ID }}">Dislike</a>
+                        </div>
+                        {{ else }}
+                        <div class="login-to-interact">
+                          <a href="/login">Login to interact</a>
+                        </div>
+                        {{ end }}
+                      </div>
+                    </div>   
+                  {{ end }}
+                {{ else }}
+                  <p>No comments yet.</p>
+                {{ end }}
+              </div>
+              
+            </div> <!-- Closing the div for each post -->
+          {{ end }}
+        {{ else }}
+        <div class="post">
+          <p>No posts available.</p>
+        </div>
+        {{ end }}
+      </div>
+    </div>
+  </main>
+  <footer>
+    <p>&copy; 2025 My Forum. All rights reserved.</p>
+  </footer>
+</body>
+</html>

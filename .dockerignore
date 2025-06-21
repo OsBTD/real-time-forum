@@ -1,0 +1,5 @@
+# Ignore .git directory
+.git
+
+# Ignore README.md file
+README.md
