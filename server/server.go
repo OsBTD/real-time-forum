@@ -45,6 +45,6 @@ func Run() error {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	fmt.Println("Server is running on http://localhost:8080")
+	fmt.Println("Server is running on http://localhost:9090")
 	return server.ListenAndServe()
 }

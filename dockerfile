@@ -1,32 +1,33 @@
-# Use Golang image with Alpine as the base image
 FROM golang:1.23-alpine
 
-# Install necessary dependencies: sqlite, GCC, and musl-dev (for cgo)
+# Set up alternative Alpine package repositories
+RUN echo "http://dl-4.alpinelinux.org/alpine/v3.22/main" > /etc/apk/repositories && \
+    echo "http://dl-4.alpinelinux.org/alpine/v3.22/community" >> /etc/apk/repositories
+
+# Debug network connectivity
+RUN apk add --no-cache curl && \
+    curl -v http://dl-4.alpinelinux.org/alpine/v3.22/main/x86_64/APKINDEX.tar.gz || echo "Failed to fetch APKINDEX"
+
+# Install dependencies
 RUN apk update && apk add --no-cache sqlite sqlite-libs gcc g++ musl-dev
 
-# Set the working directory inside the container
+# Set up working directory
 WORKDIR /app
 
-# Add metadata labels
-LABEL maintainer="Zakaria.Diouri@outlook.com" \
-      version="1.0" \
-      description="Go-based forum project" \
-      project="Forum Project" \
-      Team_members="Zakaria Diouri, Zakaria Kahlaoui, Oussama Atmani, Mohammed-Amine Elayachi, soufiane el walid." \
-      created_at="2025-02-18"
-
-# Copy the Go module files and download the dependencies
+# Copy go.mod and go.sum
 COPY go.mod go.sum ./
+
+# Download Go dependencies
 RUN go mod download
 
-# Copy the entire project
+# Copy the rest of the application code
 COPY . .
 
-# Build the Go project (with cgo enabled for sqlite3 support)
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o main .
+# Build the Go application
+RUN go build -o forum
 
-# Expose the port your app will use
-EXPOSE 8090
+# Expose port
+EXPOSE 8080
 
-# Run the Go binary when the container starts
-CMD ["./main"]
+# Command to run the application
+CMD ["./forum"]
