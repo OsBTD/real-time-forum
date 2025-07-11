@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"encoding/json"
 	"log"
 	"real-time-forum/internal/models"
 	"sync"
@@ -70,5 +71,15 @@ func (h *Hub) GetOnlineUsers() []models.User {
 }
 
 func (h *Hub) BroadcastOnlineUsers() {
-	// Implement logic to broadcast online users
+	onlineUsers := h.GetOnlineUsers()
+	msg := models.WebSocketMessage{
+		Type:    "online_users",
+		Payload: onlineUsers,
+	}
+	messageBytes, err := json.Marshal(msg)
+	if err != nil {
+		log.Printf("Error marshaling online users: %v", err)
+		return
+	}
+	h.broadcast <- messageBytes
 }

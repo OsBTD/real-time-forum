@@ -1,10 +1,13 @@
+// internal/websocket/client.go
 package websocket
 
 import (
 	"database/sql"
+	"encoding/json"
 	"log"
 	"net/http"
 	"real-time-forum/internal/auth"
+	"real-time-forum/internal/models"
 
 	"github.com/gorilla/websocket"
 )
@@ -38,8 +41,21 @@ func (c *Client) readPump() {
 			break
 		}
 
-		// Process message and broadcast
-		c.hub.broadcast <- message
+		// Handle different message types
+		var wsMsg models.WebSocketMessage
+		if err := json.Unmarshal(message, &wsMsg); err != nil {
+			log.Printf("Error unmarshaling message: %v", err)
+			continue
+		}
+
+		switch wsMsg.Type {
+		case "get_online_users":
+			// Client requested online users
+			c.hub.BroadcastOnlineUsers()
+		default:
+			// Broadcast other messages
+			c.hub.broadcast <- message
+		}
 	}
 }
 
