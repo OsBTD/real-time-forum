@@ -54,7 +54,7 @@ func (c *Client) readPump() {
 			c.hub.BroadcastOnlineUsers()
 		default:
 			// Broadcast other messages
-			c.hub.broadcast <- message
+			c.hub.Broadcast <- message
 		}
 	}
 }

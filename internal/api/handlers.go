@@ -238,7 +238,7 @@ func (a *API) SendMessageHandler(w http.ResponseWriter, r *http.Request) {
 		Payload: msg,
 	}
 	messageBytes, _ := json.Marshal(wsMessage)
-	a.Hub.broadcast <- messageBytes
+	a.Hub.Broadcast <- messageBytes
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Message sent successfully"})

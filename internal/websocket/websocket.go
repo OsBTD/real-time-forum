@@ -9,7 +9,7 @@ import (
 
 type Hub struct {
 	clients    map[*Client]bool
-	broadcast  chan []byte
+	Broadcast  chan []byte
 	register   chan *Client
 	unregister chan *Client
 	mu         sync.Mutex
@@ -18,7 +18,7 @@ type Hub struct {
 func NewHub() *Hub {
 	return &Hub{
 		clients:    make(map[*Client]bool),
-		broadcast:  make(chan []byte),
+		Broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 	}
@@ -42,7 +42,7 @@ func (h *Hub) Run() {
 			h.mu.Unlock()
 			log.Printf("Client unregistered: %s", client.nickname)
 
-		case message := <-h.broadcast:
+		case message := <-h.Broadcast:
 			h.mu.Lock()
 			for client := range h.clients {
 				select {
@@ -81,5 +81,8 @@ func (h *Hub) BroadcastOnlineUsers() {
 		log.Printf("Error marshaling online users: %v", err)
 		return
 	}
-	h.broadcast <- messageBytes
+	h.Broadcast <- messageBytes
+}
+func (h *Hub) SendMessage(messageBytes []byte) {
+	h.Broadcast <- messageBytes
 }
