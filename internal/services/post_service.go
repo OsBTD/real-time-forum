@@ -80,3 +80,17 @@ func (s *PostService) GetPosts(limit, offset int) ([]models.Post, error) {
 }
 
 // Similar methods for comments and reactions
+func (s *PostService) CreateComment(postID, userID int, content string) error {
+	if content == "" {
+		return errors.New("comment cannot be empty")
+	}
+
+	stmt := `INSERT INTO comments (post_id, user_id, comment, created_at) 
+	         VALUES (?, ?, ?, ?)`
+
+	_, err := s.DB.Exec(stmt, postID, userID, content, time.Now().Format(time.RFC3339))
+	if err != nil {
+		return fmt.Errorf("failed to create comment: %w", err)
+	}
+	return nil
+}

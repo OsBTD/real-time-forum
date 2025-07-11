@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"log"
+	"real-time-forum/internal/models"
 	"sync"
 )
 
@@ -53,6 +54,19 @@ func (h *Hub) Run() {
 			h.mu.Unlock()
 		}
 	}
+}
+func (h *Hub) GetOnlineUsers() []models.User {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	users := make([]models.User, 0, len(h.clients))
+	for client := range h.clients {
+		users = append(users, models.User{
+			ID:       client.userID,
+			Nickname: client.nickname,
+		})
+	}
+	return users
 }
 
 func (h *Hub) BroadcastOnlineUsers() {
