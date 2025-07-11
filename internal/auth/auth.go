@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"internal/models"
+	"real-time-forum/internal/models"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
