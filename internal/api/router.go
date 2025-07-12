@@ -31,11 +31,15 @@ func SetupRouter(db *sql.DB, hub *websocket.Hub) *mux.Router {
 	// WebSocket endpoint
 	router.HandleFunc("/ws", api.WebSocketHandler)
 
-	// Serve static files (CSS, JS)
-	// Note the directory is "front", not "frontend"
-	fs := http.FileServer(http.Dir("./front/"))
-	router.PathPrefix("/js/").Handler(fs)
-	router.Handle("/style.css", http.FileServer(http.Dir("./front")))
+	// Create a file server for the 'front' directory
+	staticFileServer := http.FileServer(http.Dir("./front"))
+
+	// Serve JS files. http.StripPrefix is used to remove the '/js/' part
+	// so the file server can find the files in the root of the 'front' directory.
+	router.PathPrefix("/js/").Handler(http.StripPrefix("/js/", staticFileServer))
+
+	// Serve the style.css file directly
+	router.Handle("/style.css", staticFileServer)
 
 	// Serve the main index.html for the root path
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
