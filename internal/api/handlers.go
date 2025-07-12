@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
+
 	"real-time-forum/internal/auth"
 	"real-time-forum/internal/models"
 	"real-time-forum/internal/services"
 	"real-time-forum/internal/websocket"
-	"strconv"
-	"time"
 )
 
 type API struct {
@@ -256,4 +257,17 @@ func (a *API) getSessionUser(r *http.Request) (*models.User, error) {
 		return nil, err
 	}
 	return auth.ValidateSession(a.DB, cookie.Value)
+}
+
+func (a *API) SessionCheckHandler(w http.ResponseWriter, r *http.Request) {
+	user, err := a.getSessionUser(r)
+	if err != nil {
+		// No valid session found
+		http.Error(w, "Not authenticated", http.StatusUnauthorized)
+		return
+	}
+
+	// Session is valid, return user info
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 }

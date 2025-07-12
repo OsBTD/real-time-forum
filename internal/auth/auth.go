@@ -6,8 +6,9 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"real-time-forum/internal/models"
 	"time"
+
+	"real-time-forum/internal/models"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -44,7 +45,7 @@ func ValidateSession(db *sql.DB, token string) (*models.User, error) {
 	}
 
 	query := `SELECT id, first_name, last_name, email, gender, age, nickname 
-	          FROM users WHERE session_token = ? AND datetime(created_at, '+1 day') > datetime('now')`
+          FROM users WHERE session_token = ?`
 
 	row := db.QueryRow(query, token)
 	user := &models.User{}
@@ -57,7 +58,6 @@ func ValidateSession(db *sql.DB, token string) (*models.User, error) {
 		&user.Age,
 		&user.Nickname,
 	)
-
 	if err != nil {
 		return nil, fmt.Errorf("invalid session: %w", err)
 	}
