@@ -127,17 +127,3 @@ function appendMessage(message) {
     chatContainer.appendChild(messageElement);
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
-
-function handleSocketMessage(message) {
-    switch (message.type) {
-        case 'online_users':
-            updateOnlineUsers(message.payload);
-            break;
-        case 'chat_message':
-            if (message.payload.sender === currentChatUser) {
-                appendMessage(message.payload);
-            }
-            break;
-        // ... other cases ...
-    }
-}

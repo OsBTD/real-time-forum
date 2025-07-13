@@ -36,8 +36,8 @@ func SetupRouter(db *sql.DB, hub *websocket.Hub) *mux.Router {
 
 	// Serve JS files. http.StripPrefix is used to remove the '/js/' part
 	// so the file server can find the files in the root of the 'front' directory.
-	router.PathPrefix("/js/").Handler(http.StripPrefix("/js/", staticFileServer))
-
+	jsFileServer := http.FileServer(http.Dir("./front/js"))
+	router.PathPrefix("/js/").Handler(http.StripPrefix("/js/", jsFileServer))
 	// Serve the style.css file directly
 	router.Handle("/style.css", staticFileServer)
 
